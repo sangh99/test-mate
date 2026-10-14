@@ -23,13 +23,13 @@ Source file counts do not measure feature completeness; one safety-critical libr
 | Relay, public commitments, mail and voice | 17 | Partial | Optional Relay connector behind an HTTP adapter with mention wakes, follow-up budget, and typed promised final replies that gate cleanup, and the consent-gated durable Outbox; planned mail and voice connectors |
 | Persistent and remote secondmates | 33 | Partial | Local secondmate registry, Transport adapter, transactional Handoff, correlated requests and published replies, bounded relaunch, shared preferences; planned remote transport |
 | Registered checks, process events and extensions | 13 | Partial | One extension registry opened by the supervisor, process-to-event sources with registration generations, durable captured results and handled acknowledgements; planned registered checks, condition-action watches, and trusted external adapters |
-| Fleet projections and presentation | 6 | Partial | CLI list/show; planned FleetSnapshot and reporting |
+| Fleet projections and presentation | 6 | Partial | FleetSnapshot behind list, fleet and bearings (terminal, JSON, or a dated file) with opt-in live PR reads; planned visual fleet board |
 | Model dispatch, accounts and quota | 6 | Partial | Dispatch profiles with precedence, quota-resolved profile arrays with per-candidate evidence, the effort fallback, and Claude account pins; planned vendor auth probes, tool exclusions, and mid-task quota wakes |
 | Terminal and harness-specific mechanics | 35 | Replace mechanism | Worker runtime adapter with the Claude SDK as the verified reference; optional future runtime adapters |
 | Validation, publishing and landing | 19 | Partial | Delivery modes, merge authority, local-only landing, GitHub direct-PR delivery through the Forge adapter, no-mistakes validation through the Pipeline adapter, clone refresh, and Cleanup; planned other forges |
 | Continuous supervision and recovery | 30 | Partial | Supervisor, wake queue, event classifier, recovery ladder and per-project capacity; planned fleet review |
 | Task lifecycle and durable steering | 18 | Partial | TaskStore steering records, lifecycle controls, the backlog and captain holds, Orchestrator streaming input; planned keyed-answer channels and board reconcile requests |
-| Projects, configuration and process utilities | 18 | Partial | Worktrees, ProcessRunner, project registry with intake resolution and capacity; planned Config beyond the registry, Update |
+| Projects, configuration and process utilities | 18 | Partial | Worktrees, ProcessRunner, project registry with intake resolution and capacity, npm self-update that drains and restarts the supervisors, and opt-in Bash record import; planned Config beyond the registry |
 
 Partial means some basic behavior exists, with legacy guarantees still to implement.
 Replace mechanism means terminal plumbing is unnecessary for a Claude SDK runtime; its generic ownership, permission, or supervision contracts still need host services.
@@ -40,10 +40,10 @@ Development only identifies old repository tooling rather than an application ca
 1. Explicit holds; durable steering with evidence-backed acknowledgements is implemented, and so are a backlog of items apart from tasks and captain holds on any item that only the captain's verbatim answer closes.
 2. Continuous supervision; the supervisor lease, durable consumer acknowledgements, actionable-event classification, SDK-activity liveness, bounded recovery and per-project capacity are implemented, while fleet review against forge state remains.
 3. Validation and delivery; explicit delivery modes and merge posture, the merge-authority evaluation, proven local-only landing, GitHub direct-PR publishing, current-head checks, head-bound merges and forge landing proof, and no-mistakes validation with durable gates and holds, the guarded clone refresh after a forge landing, and cleanup that refuses unlanded work are implemented, while other forges remain.
-4. Project registration, posture resolution and capacity are implemented, and so are backlog dependencies and defer dates; fleet views from one structured projection remain.
+4. Project registration, posture resolution and capacity are implemented, and so are backlog dependencies, defer dates, and fleet views from one structured projection.
 5. Persistent secondmates and remote execution with host-bound identity, correlations and reply recovery.
 6. Dispatch policy over verified runtimes, quota evidence and account pins is implemented, while runtimes other than Claude remain.
-7. Away and quiet posture, the return brief, home memory and stow are implemented, and so are the extension registry, process sources, the captain inbox, Relay, upstream signals and the outbox; mail and voice connectors, fleet views and self-update remain.
+7. Away and quiet posture, the return brief, home memory and stow are implemented, and so are the extension registry, process sources, the captain inbox, Relay, upstream signals, the outbox, the fleet snapshot and bearings, self-update, and the opt-in Bash import; mail and voice connectors and the visual fleet board remain.
 
 The SDK supplies the model loop, tools and sessions.
 Firstmate retains responsibility for orchestration, durable obligations, authority, delivery and recovery.
@@ -87,11 +87,12 @@ Porting those shell mechanics line by line would preserve costs an SDK-based hos
 | Lifecycle control plane | Durable interrupt and relaunch requests that the owning attempt applies, separate from steering text |
 | Away/quiet posture, memory curation | A posture record per home with the away words stored verbatim as the whole mandate, supervisor triage that acknowledges routine captain wakes silently and batches captain-relevant ones, a return brief rendered only from durable records, memory files and the shared preferences record loaded into each worker's context, and stow; tiered memory decay and the startup-memory budget are not implemented |
 | Relay, inbox integrations, promised public replies | One extension registry the supervisor opens under its generation; process sources whose captured results are wakes until handled; captain inbox notes acknowledged after handling with one durable reply; optional Relay mentions with typed promised final replies that refuse their task's cleanup until reconciled; upstream signals acknowledged by exact token; and an outbox that sends a public action only on recorded consent, once under its own key; mail and voice connectors are not implemented |
-| Fleet clone synchronization and self-update | Not implemented |
+| Fleet clone synchronization and self-update | A guarded clone refresh after each forge landing; `firstmate update` installs a `firstmate-ai` package over the npm installation after draining every supervisor, refuses with nothing changed when a home is unsafe or work does not drain in time, and restarts the main and secondmate supervisors from the new installation; remote secondmate homes are not updated |
+| Fleet snapshot and bearings | One read-only projection behind `list`, `fleet`, and bearings, sorted into Captain's Call, Recently Landed, Underway and Charted Next in the terminal, as JSON, or as a dated report file; PRs are read live only with `--prs`; the visual fleet board is not implemented |
 | Desktop or browser presentation | CLI in this version |
 
 The Bash application continues to own its own state and integrations.
-This package neither imports nor migrates the old private fleet records automatically.
+This package never imports the old private fleet records automatically; `firstmate import` reads a Bash home's project registry, queued backlog items and captain holds, preferences, and learnings only when asked, showing its plan before `--apply`.
 
 The implementation drew on the local Claude Agent SDK documentation (configuration, permissions, hooks, sessions, user input, quickstart, and cost tracking), supplemented by the installed SDK's TypeScript declarations, and on the Effect v4 documentation, source, `LLMS.md`, and installed declarations.
 
@@ -248,7 +249,10 @@ The Lavish, quota, remote-reply, and condition-action (`when`) adapters, registe
 
 Status: **Partial**.
 
-Target: CLI list/show; planned FleetSnapshot and reporting.
+Target: FleetSnapshot behind list, fleet and bearings (terminal, JSON, or a dated file) with opt-in live PR reads; planned visual fleet board.
+
+The fleet snapshot replaces the bounded fleet-state reads of `fm-fleet-snapshot.sh` and `fm-bearings-snapshot.sh` with one projection of the home's own records, and bearings replaces the four-section digest and dated report the `bearings` skill composed from them.
+Secondmates appear with their observed liveness and open requests rather than through a parent-side ledger cache, so `fm-home-summary-refresh.sh` has no counterpart; `fm-fleet-ledger.sh`'s activity ledger, `fm-fleet-view.sh`'s terminal board, and `fm-bearings-board.sh`'s interactive board remain unported.
 
 - `bin/fm-bearings-board.sh`
 - `bin/fm-bearings-snapshot.sh`
@@ -430,12 +434,14 @@ Keyed-answer channels (`answers`, `bind`), board reconcile requests, wakes for h
 
 Status: **Partial**.
 
-Target: Worktrees, ProcessRunner, project registry with intake resolution and capacity; planned Config beyond the registry, Update.
+Target: Worktrees, ProcessRunner, project registry with intake resolution and capacity, npm self-update that drains and restarts the supervisors, and opt-in Bash record import; planned Config beyond the registry.
 
 The project registry replaces `data/projects.md`, `fm-project-mode.sh` and `config/project-capacity` with typed records in the home's SQLite store, validated on every load, and its CLI adds, lists, shows, updates and removes projects.
 Intake resolves each ship's delivery mode, yolo, base and target branch and branch prefix from the task or its registration, routes a `no-mistakes-prod-only` project's ships by their declared surface, and defaults an unregistered project to `no-mistakes` with yolo off, reporting the gap.
 Removal refuses while a project has unlanded work, and never touches the clone.
-Forge bindings other than GitHub (`forge=gerrit`, `forge=forgejo`), capacity shared across homes and secondmates, origin-identity matching of clones, project creation and cloning, no-mistakes initialization, the remaining configuration files and self-update remain pending.
+Forge bindings other than GitHub (`forge=gerrit`, `forge=forgejo`), capacity shared across homes and secondmates, origin-identity matching of clones, project creation and cloning, no-mistakes initialization, and the remaining configuration files remain pending.
+`firstmate update` replaces `fm-update.sh` for an npm installation: instead of fast-forwarding a Git checkout, it installs a package, and instead of the persist-gated agent restart, it drains each supervisor, so no attempt is interrupted, and restarts it from the new installation; remote secondmate homes are not covered.
+`firstmate import` reads `data/projects.md`, `data/backlog.md`, `data/captain.md`, `data/captain-shared.md`, and `data/learnings.md` from a Bash home only on request.
 
 - `bin/fm-ensure-agents-md.sh`
 - `bin/fm-env-lib.sh`

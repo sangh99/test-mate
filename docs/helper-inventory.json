@@ -1,7 +1,7 @@
 {
   "schema": "firstmate-helper-migration.v1",
   "source": "Bash Firstmate bin/",
-  "date": "2026-10-13",
+  "date": "2026-10-14",
   "assessment": "Architecture and script-header mapping, not a completed per-script behavioral audit or equivalence proof.",
   "files": 219,
   "families": {
@@ -33,7 +33,7 @@
     "views": {
       "title": "Fleet projections and presentation",
       "status": "Partial",
-      "target": "CLI list/show; planned FleetSnapshot and reporting"
+      "target": "FleetSnapshot behind list, fleet and bearings (terminal, JSON, or a dated file) with opt-in live PR reads; planned visual fleet board"
     },
     "dispatch": {
       "title": "Model dispatch, accounts and quota",
@@ -63,7 +63,7 @@
     "projects": {
       "title": "Projects, configuration and process utilities",
       "status": "Partial",
-      "target": "Worktrees, ProcessRunner, project registry with intake resolution and capacity; planned Config beyond the registry, Update"
+      "target": "Worktrees, ProcessRunner, project registry with intake resolution and capacity, npm self-update that drains and restarts the supervisors, and opt-in Bash record import; planned Config beyond the registry"
     }
   },
   "entries": [

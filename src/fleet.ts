@@ -175,7 +175,7 @@ export function bearings(snapshot: FleetSnapshot) {
   for (const task of tasks.filter(t => t.state === "queued")) charted.push({ line: `task ${task.id} queued: ${titleOf(task)}` });
   for (const task of tasks.filter(t => t.state === "interrupted")) charted.push({ line: `task ${task.id} interrupted, resumable: ${titleOf(task)}`, detail: [`firstmate resume ${task.id}, or the supervisor resumes it`] });
   for (const item of snapshot.backlog.filter(i => i.status === "queued")) {
-    charted.push({ line: `item ${item.id} (${item.kind}): ${item.title}${item.waiting.length ? ` - waits on ${item.waiting.join("; ")}` : " - ready to dispatch"}`, detail: [`Filed ${item.createdAt.slice(0, 10)}${item.project ? ` for ${item.project}` : ""}`] });
+    charted.push({ line: `item ${item.id} (${item.kind}): ${item.title}${item.waiting.length ? ` - ${item.waiting.join("; ")}` : " - ready to dispatch"}`, detail: [`Filed ${item.createdAt.slice(0, 10)}${item.project ? ` for ${item.project}` : ""}`] });
   }
   for (const project of snapshot.projects) if ("malformed" in project) charted.push({ line: `warning: project ${project.name} is malformed: ${project.malformed}` });
   if (snapshot.supervisor.owner === "absent") charted.push({ line: "warning: no supervisor is running; queued work waits for firstmate supervisor start" });

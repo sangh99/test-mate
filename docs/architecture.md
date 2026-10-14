@@ -777,6 +777,47 @@ A consented action is claimed as `sending` and delivered by the extension owning
 A sent action records its receipt, and sending it again returns the receipt without a second post; a failed send stays consented for a retry under the same key.
 The supervisor sends consented actions on its own and raises an `outbox` wake when a send fails.
 
+## Fleet view and maintenance
+
+### Fleet snapshot
+
+`fleetSnapshot` is the one read-only projection of a home every fleet report reads: each task with its observed owner, backlog items with what each waits on, open holds, pending decisions, PRs, active secondmates with their observed liveness and open requests, supervisor health including a drain request, posture, registered projects, open captain wakes, what the extensions hold waiting (unhandled source results and stopped sources, inbox notes, Relay mentions and open promises, upstream signals, actions awaiting consent), and the completions of the last `--days` (landings, finished scouts, closed items).
+It writes nothing; only `--prs` contacts a forge, reading each PR's current head, required checks, and merge verdict through the same evaluation `firstmate checks` uses.
+`firstmate list` prints its task rows and `firstmate fleet` prints all of it.
+
+### Bearings
+
+`bearings` sorts a snapshot into the four sections a captain resumes from, each always present with an empty-state sentence: Captain's Call (open holds not deferred, pending decisions, review-ready work, blockers, inbox notes, mentions, upstream signals, actions awaiting consent, source results, stopped sources, and secondmates out of relaunches), Recently Landed, Underway (live, validating, and self-driving work, and open secondmate requests), and Charted Next (deferred holds, queued and interrupted tasks, queued items with what they wait on, and integrity warnings).
+It is a pure function of the snapshot, so it never disagrees with `fleet`.
+`--file` replaces `<home>/reports/bearings-<YYYY-MM-DD>.md` from scratch with each item's detail; the terminal text and `--json` carry one line per item.
+
+### Supervisor drain
+
+`firstmate supervisor drain` records a drain request on the supervisor lease, like a stop request without a signal.
+At each review a draining supervisor starts no attempt, recovery, relaunch, validation, merge, or secondmate relaunch, and it stops with reason `drained` once the attempts and validations it runs have ended; their wakes stay for the next supervisor.
+`--cancel` withdraws the request.
+The lease records every interval the supervisor was started with, so a restart can reproduce it.
+
+### Self-update
+
+`firstmate update --to <spec>` replaces this npm installation of `firstmate-ai`, located from the running package (`<prefix>/lib/node_modules` or a Windows global prefix with its shims, else a project's `node_modules`); a source checkout is refused.
+The update plans every home it restarts, the main home and each active secondmate home, and refuses with nothing changed when a supervisor's liveness is unknown, a home cannot be read, or a task runs in the foreground.
+The plan is recorded as an update run (at most one is unfinished) before anything changes.
+Each running supervisor is asked to drain, the main home's first so it stops relaunching its secondmates; when one still runs work after `--wait`, every drain is withdrawn, the supervisors that already stopped are restarted, and the run is recorded refused with nothing installed.
+`npm install` then runs with an argument array (through `cmd.exe` only for npm's Windows shim); a failure restarts the supervisors on the version still installed and records the run failed.
+After a successful install the drained supervisors restart from the installed CLI, secondmates first and recorded as the captain's launch, each detached with its log in `<home>/supervisor.log` and confirmed when it holds its home's lease.
+`firstmate update resume` finishes a run an interruption left: it withdraws a drain still requested, restarts what stopped, and closes the run.
+Work is never interrupted or discarded by an update; draining is the only way a supervisor stops for one.
+
+### Bash import
+
+`firstmate import --from <bash home>` reads a Bash Firstmate home's `data` records only when asked and shows its plan; `--apply` imports it.
+Registry lines become projects with their posture, yolo, and branch prefix (`fm/` when the Bash line names none) from the clone in `--clones`; a forge binding other than the default and a missing clone are skipped.
+Queued backlog items become queued items in dependency order, with their Bash repository when it is registered, a host note recording where each came from, and their body lines as notes; a captain hold becomes an open hold with its decoded reason and date, and another kind of hold a note and, when dated, a deferral.
+In-flight and done Bash items, unknown kinds, and items that wait on work that is neither done nor imported stay behind.
+`captain.md`, `captain-shared.md`, and `learnings.md` are appended verbatim to the preferences, shared preferences, and learnings memory unless the memory already holds their text.
+Each imported record is remembered under its source key, so a repeat imports nothing twice; the Bash home is never written.
+
 ## Current scope
 
 Implemented today:
@@ -796,6 +837,7 @@ Implemented today:
 - Local persistent secondmates: isolated homes with their own store and supervisor launched as separate processes, idle until work is routed to them, an inspectable routing decision, correlated requests with replies read from published status, transactional backlog handoff with recovery, a bounded relaunch policy that escalates as a captain hold, main-authoritative shared preferences, and retirement refused over unlanded work.
 - Away and quiet postures with the away words stored verbatim as the whole mandate, supervisor triage that acknowledges routine captain wakes silently and batches captain-relevant ones, a return brief rendered from durable records, home memory loaded into each worker's context, and stow.
 - One extension registry opened by the supervisor; process sources with registration generations, deterministic conditions, durable results, bounded re-announcement, and handled acknowledgements; the captain inbox; optional Relay with promised final replies that gate cleanup; upstream signals acknowledged by exact token; and the consent-gated outbox.
+- One read-only fleet snapshot behind `list`, `fleet`, and bearings in text, JSON, or a dated file; a supervisor drain; self-update of the npm installation that drains and restarts the supervisors; and an explicit Bash record import.
 
 Not yet implemented:
 
@@ -807,7 +849,8 @@ Not yet implemented:
 - Remote secondmates: a transport to another host, host-bound identity, and remote recovery.
 - Secondmate replies and exits raised as captain wakes, recovery of a missed reply, inheritance of configuration other than the shared preferences, and removing a retired secondmate's home.
 - Runtimes other than Claude, model catalog checks, inheritance of `dispatch.json` by secondmate homes, account pins for runtimes other than Claude, and mid-task quota wakes.
-- Mail and voice connectors, fleet reports, and self-update.
+- Mail and voice connectors, and an optional visual fleet board.
+- Self-update of remote secondmate homes, and Bash import of task metadata, secondmate registries, and in-flight work.
 - The Lavish, quota, remote-reply, and condition-action source adapters, registered checks, external extension packages, sources shared across homes, Relay thread splitting and inbound media, promises bound to secondmate homes, and maintainer verdicts bound to a judged head.
 - A spend cap or expected return recorded with away, the return's catch-up gate over open blockers, tiered memory decay and a startup-memory budget, stow cascading to secondmates, and memory loaded into any context other than a worker's, since the app composes no supervising model context.
 - Desktop or browser presentation; the interface is a CLI.

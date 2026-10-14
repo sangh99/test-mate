@@ -1,6 +1,6 @@
 # Verification
 
-Recorded on 2026-10-13; the backlog, secondmate, posture, and integrations and events checks on 2026-10-14.
+Recorded on 2026-10-13; the backlog, secondmate, posture, integrations and events, and fleet view and maintenance checks on 2026-10-14.
 
 ## Executed environment
 
@@ -38,8 +38,10 @@ After away and quiet posture, memory, and stow were added, `npm run typecheck` p
 No automated test covers posture, triage, the return brief, memory, or stow; they were verified through the CLI as described below.
 After the extension registry, process sources, the captain inbox, Relay, upstream signals, and the outbox were added, `npm run typecheck` passed and `npm test` again passed all 47 tests, with the migration tests expecting schema version 13.
 No automated test covers them; they were verified through the CLI as described below.
-The migration test that opens a fresh home from two processes at once intermittently fails with `database is locked` while setting the journal mode, in 3 of 12 runs of the `main` build as well, so it predates this change.
-The concurrent-open migration test failed once in about a dozen runs with `database is locked` while switching to WAL; the same test on `main` failed once in 25 runs, so the race predates this change.
+After the fleet snapshot, bearings, the supervisor drain, self-update, and the Bash import were added, `npm run typecheck` passed and `npm test` again passed all 47 tests, with the migration tests expecting schema version 14.
+No automated test covers them; they were verified through the CLI as described below.
+The migration test that opens a fresh home from two processes at once used to fail intermittently with `database is locked` while switching the new database to WAL (3 of 8 runs of the 2026-10-14 `main` build); opening a home now retries that switch for a bounded time, and 12 consecutive runs then passed.
+The queue concurrency test's fake attempts now overlap for 300 ms instead of 30 ms, after a GitHub Actions Linux run measured a peak of one concurrent attempt.
 
 ```text
 tests 47
@@ -277,8 +279,7 @@ One scripted run passed every scenario below; the full command transcript is kep
   Live mutation-approval hooks and all tool execution paths remain unverified by that narrow smoke test.
 - Live steering was verified for a message queued before the run.
   A message arriving mid-turn, CLI coalescing of several queued messages, and the idle settle timeout are covered only by the injected-protocol tests.
-- Windows and Linux execution has not been tested in this session.
-  The standalone workflow defines those lanes for a repository rooted at this directory.
+- The deterministic suite and `npm pack --dry-run` passed on Windows, macOS, and Linux in GitHub Actions, as recorded under [Fleet view and maintenance CLI verification](#fleet-view-and-maintenance-cli-verification); every CLI scenario ran only on macOS.
 - Cross-platform native SDK startup and live approval-hook behavior require execution on each target platform.
 - `node:sqlite` emitted its documented experimental-feature warning in the tested Node release.
 - This is a local core migration, not verification of legacy Relay or remote secondmate behavior.
@@ -313,3 +314,24 @@ One scripted run passed every scenario below; the full command transcript is kep
 | Upstream signal | A throwaway issue was linked to a backlog item from its state at link time. A comment and the issue's closing became `comment` and `closed` signals with wakes; `upstream ack` refused an unknown token, acknowledged the exact tokens with their dispositions, and was idempotent. |
 | Upstream comment through the outbox | `outbox send` without consent was refused and GitHub showed no comment; after consent it was posted once, sending again was `already-sent`, and a send retried from the `sending` state found the comment by its key's marker instead of posting again. The posted comment was not reported back as a signal. |
 | Upgrade | A home created by the `main` build at schema version 12, holding supervisor wakes and a captain wake its away session triaged, opened at version 13 with every wake's sequence, task, and status and its triage intact and no foreign-key violations; the return brief still listed the triaged wake, an inbox wake was presented and acknowledged with it, and the older build then refused the home as newer. |
+
+## Fleet view and maintenance CLI verification
+
+The fleet snapshot, bearings, the supervisor drain, self-update, and the Bash import were verified with the built `firstmate` executable on macOS ARM64 with Node v24.5.0 and npm 11.5.1 against temporary homes, with workers on the real bundled Claude executable against a local fake Messages API, so no model was contacted.
+Self-update ran an installed copy: the branch packed with `npm pack` as 0.1.0 and as 0.1.1 (only the version changed), 0.1.0 installed with `npm install --global --prefix <temporary prefix>`, and neither published.
+GitHub operations used the throwaway repository `sangh99/test-mate` through GitHub CLI 2.75.0.
+One scripted run passed every scenario below; the full command transcript is kept with the task's private evidence.
+
+| Scenario | Observed through the CLI, SQLite, npm, and GitHub |
+| --- | --- |
+| Snapshot | One home held a review-ready local-only ship, a landed one, a finished scout, a direct-PR ship whose PR the forge opened, a queued task, a queued item, an item depending on it and held with a future `--until`, a held captain item, a launched secondmate, quiet posture, an inbox note, a captured source result, and an upstream comment awaiting consent. `fleet` listed each with its state, the secondmate `live`, the supervisor `absent`, and the landing and the scout's report as recent; `list` printed exactly its task rows. |
+| Bearings | The text and `--json` forms put the open hold, both review-ready ships, the note, the outbox action, and the source result under Captain's Call, the landing and the report under Recently Landed, and the deferred hold, the queued task, the ready item, and a no-supervisor warning under Charted Next. `--file` wrote `reports/bearings-<date>.md` with each item's detail, and a second run replaced it rather than appending. The database's event, home event, wake, and item event counts were unchanged by every form, `--prs` included. |
+| Live PRs | `fleet --prs` read the open PR's head and its required check `firstmate/required` as `unreported` and reported it not mergeable for that reason and the missing approval; without `--prs` no forge call was made. After the hold was answered, the note handled, and the queued task cancelled, bearings moved each of them, and showed the running supervisor `live`. |
+| Refused: foreground run | With a task running in the foreground, `update` was refused naming it, recorded as a refused run, and changed nothing: the version stayed 0.1.0 and the same supervisor kept running. |
+| Refused: no drain in time | With the supervisor running a task that never ends, `update --wait 3` drained the idle secondmate, withdrew the main supervisor's drain after three seconds, restarted the secondmate on 0.1.0 under a new PID, and was refused naming the task; the task kept running under the same supervisor and nothing was installed. |
+| Dry run | `update --dry-run` printed the npm argument array and each home's restart arguments, reproduced from its supervisor's recorded settings, and recorded nothing. |
+| Interrupted and resumed | An update killed with SIGKILL while draining left its run recorded as `draining` with the drain still requested; a new `update` was refused as unfinished, and `update resume` withdrew the drain, restarted the secondmate that had stopped, and closed the run `failed` with 0.1.0 still installed. |
+| Safe update | With no work running, `update` drained both supervisors (the original exited with reason `drained`), installed 0.1.1, and restarted the secondmate and then the main supervisor from the new installation under new PIDs with the same settings; `doctor` reported 0.1.1, the old PIDs were gone, task states were unchanged, and a task queued afterwards was run by the restarted supervisor. The home recorded `update.refused`, `update.started`, `update.failed`, and `update.finished` events, and no Firstmate process was left running afterwards. |
+| Import | A copy of the Bash home's `data` directory, extended with queued items, a dependency, an encoded captain hold, a dated `future` hold, an item blocked by in-flight work, a `secondmate` row, a Gerrit-bound project, and a project without a clone, was planned without `--apply` (the home stayed empty) and then imported: one project with its posture and the `fm/` prefix, four items in dependency order with the decoded captain question and date as an open hold, the future hold as a deferral and note, and the preferences and learnings verbatim. Every other record was skipped with its reason; a second `--apply` imported nothing, `--only learnings` imported only learnings, and the Bash files' digests were unchanged, the original's included. |
+| Upgrade | A home created by the `main` build at schema version 13, with a lease left by a supervisor killed with SIGKILL, queued work, a hold, an inbox note, and away posture, opened at version 14 with the `updates` and `imports` tables; the snapshot and bearings read every record, a new supervisor reclaimed the lease and stopped with reason `drained` on `supervisor drain`, and the older build then refused the home as newer. |
+| Cross-platform CI | The workflow ran `npm ci`, `npm test`, and `npm pack --dry-run` on ubuntu-latest, macos-latest, and windows-latest for this branch's tree pushed to `sangh99/test-mate`. Its first runs failed on Windows, where a home and a project under a temporary directory compared as an 8.3 short name against its long form, so the home-inside-project refusal did not fire; containment now compares native real paths, of a path's nearest existing ancestor when it does not exist yet. |

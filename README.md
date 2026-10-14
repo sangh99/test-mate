@@ -243,6 +243,7 @@ firstmate supervisor status
 firstmate supervisor wakes
 firstmate supervisor ack --generation <generation> --through <sequence>
 firstmate supervisor stop
+firstmate supervisor drain [--cancel]
 ```
 
 The supervisor runs in the foreground until Ctrl+C or `firstmate supervisor stop` from another terminal, and only one may hold a home at a time.
@@ -257,6 +258,7 @@ Waiting makes no model calls, but every resumed attempt does, within the task's 
 In the main home it reviews its secondmates every `--secondmate-every` seconds (default 5), as [Secondmates](#secondmates) describes; in a secondmate's home it serves only the work routed to it.
 It also runs process sources, polls Relay, observes upstream links, and sends consented outbox actions, as [Events, inbox, Relay, and the outbox](#events-inbox-relay-and-the-outbox) describes.
 `supervisor status` shows the supervisor's lease, settings, last review, open wakes, owned tasks, and recovery counts as JSON.
+`supervisor drain` asks it to start nothing new and stop once the work it runs has ended, without interrupting anything; `--cancel` withdraws the request.
 
 ## Secondmates
 
@@ -375,6 +377,35 @@ Each public mention becomes a wake; its text is untrusted.
 
 Nothing is published without your consent: `relay reply` and `upstream comment` only queue an outbox action, `outbox consent` records your consent to that exact action, and only then does `outbox send`, or the running supervisor, send it, once, under its own key.
 
+## Fleet, bearings, update, and import
+
+```text
+firstmate list
+firstmate fleet [--prs] [--days <n>]
+firstmate bearings [--file] [--prs] [--days <n>] [--json]
+firstmate update --to <version|tag|tarball> [--wait <s>] [--dry-run]
+firstmate update status | resume
+firstmate import --from <bash home> [--clones <dir>] [--only projects,backlog,preferences,learnings] [--apply]
+firstmate import list
+```
+
+`list`, `fleet`, and `bearings` read the same snapshot of the home: tasks, backlog items, holds, decisions, PRs, secondmates, the supervisor's health, your posture, open wakes, and what the inbox, sources, Relay, upstream links, and the outbox hold waiting.
+`bearings` is the catch-up report in four sections: Captain's Call (what needs you), Recently Landed (the last `--days`, default 7), Underway, and Charted Next.
+`--file` also writes it with each item's detail to `<home>/reports/bearings-<YYYY-MM-DD>.md`, replacing today's file.
+None of them changes the home, and only `--prs` contacts GitHub, for each PR's current head, checks, and whether it could merge.
+
+`update` replaces an npm installation of `firstmate-ai` with the package you name, which can be a version, a tag, or a local tarball, and restarts the supervisors that were running, your secondmates' included.
+It records its plan, then asks each running supervisor to drain, so no task is interrupted.
+It refuses with nothing changed while a task runs in the foreground or a supervisor's liveness is unknown, and when work is still running after `--wait` seconds (default 600) it withdraws the drain and restarts anything that already stopped, installing nothing.
+If npm fails, the supervisors restart on the version you had.
+Restarted supervisors run in the background and log to `<home>/supervisor.log`; `supervisor stop` stops them as usual.
+`--dry-run` shows the plan and whether it is safe; `update status` lists every run, and `update resume` finishes one an interruption left behind.
+A source checkout is not an npm installation; update it with Git and `npm run build`.
+
+`import` brings records over from a Bash Firstmate home, only when you run it: the project registry (from the clones under `--clones`, default `<bash home>/projects`), queued backlog items with their captain holds, and your preferences, shared preferences, and learnings.
+Without `--apply` it only shows what it would import and why it skips the rest; in-flight and done Bash items stay where they are, and the Bash home is never written.
+Each record is imported once, so running it again imports only what is new.
+
 ## Private data
 
 The default home is `~/.firstmate-ai` and is separate from the Bash application's home.
@@ -382,13 +413,15 @@ Override it using `FIRSTMATE_HOME` or `--home`; all participating terminals must
 Keep the home outside the source repository and on a local filesystem.
 
 ```text
-firstmate.sqlite       Task state, leases, decisions, steering, lifecycle controls, wakes, event history, the project registry, the backlog with its holds, secondmates with their requests and handoffs, account pins, away and quiet sessions, shared preferences, the home's posture, memory, and stow history, process sources and their results, inbox notes and replies, Relay mentions and promises, upstream links and signals, and the outbox
+firstmate.sqlite       Task state, leases, decisions, steering, lifecycle controls, wakes, event history, the project registry, the backlog with its holds, secondmates with their requests and handoffs, account pins, away and quiet sessions, shared preferences, the home's posture, memory, and stow history, process sources and their results, inbox notes and replies, Relay mentions and promises, upstream links and signals, the outbox, self-update runs, and imported Bash records
 dispatch.json          Optional dispatch rules, default profiles, and quota source, written by you
 memory/                Your working preferences (preferences.md) and learnings (learnings.md)
 secondmates/<id>/      Each secondmate's own home, unless created elsewhere with --at
 firstmate.sqlite-wal   SQLite write-ahead log while open
 worktrees/<task-id>/   Preserved Git worktree for each task
 reports/<task-id>/     Immutable scout report per execution generation
+reports/bearings-<date>.md  The day's bearings report, written only by bearings --file
+supervisor.log         Output of a supervisor started in the background by update or secondmate launch
 ```
 
 Prompts, tool approval inputs, responses, and reports are private local data and may contain project content.
@@ -409,6 +442,6 @@ These adapter tests do not prove live Claude behavior or authentication.
 `npm run test:live` performs a real completion-and-resume smoke test and a steering-evidence test using the SDK's normal authentication, including an existing Claude login.
 It consumes subscription usage or API billing according to the selected authentication, with three attempts each configured with a $0.50 SDK budget limit.
 It fails on authentication errors rather than skipping when an API key is absent.
-The standalone CI definition in `.github/workflows/ci.yml` tests Windows, macOS, and Linux when this directory is the repository root.
+The standalone CI definition in `.github/workflows/ci.yml` tests Windows, macOS, and Linux when this directory is the repository root; its latest run on all three is recorded in [verification](docs/verification.md).
 It is not active as a nested workflow in the parent Bash repository.
 See [verification](docs/verification.md) for the actual results and remaining platform checks.

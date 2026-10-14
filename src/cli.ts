@@ -432,6 +432,8 @@ function captainAction(command: string, verb: string | undefined, values: Record
   const read = reads[command];
   if (read === true) return false;
   if (command === "backlog" && verb === "config" && values["done-keep"] === undefined) return false;
+  // A planned update or import that is not carried out changes nothing.
+  if ((command === "update" && verb === undefined && values["dry-run"]) || (command === "import" && verb === undefined && !values.apply)) return false;
   return !read?.includes(verb ?? "");
 }
 
