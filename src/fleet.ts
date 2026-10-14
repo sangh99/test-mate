@@ -45,11 +45,10 @@ export const fleetSnapshot = Effect.fn("firstmate.fleetSnapshot")(function*(opti
   const posture = yield* store.posture();
   const items = yield* store.items();
   const holds = (yield* store.holds()).filter(hold => hold.status === "open");
-  const live = yield* Effect.forEach(tasks.filter(task => task.run.pr), task => options.prs
-    ? evaluateMerge(task.id).pipe(
+  const live = new Map(yield* Effect.forEach(tasks.filter(task => task.run.pr && options.prs), task => evaluateMerge(task.id).pipe(
       Effect.map(({ pr, checks, verdict }) => ({ task: task.id, state: pr.state, head: pr.head, checks: checks.map(c => ({ name: c.name, conclusion: c.conclusion })), mergeable: verdict.authorized, refusal: verdict.authorized ? null : verdict.reasons, error: null as string | null })),
-      Effect.catch(error => Effect.succeed({ task: task.id, state: null, head: null, checks: [], mergeable: null, refusal: null, error: error.message })))
-    : Effect.succeed(null));
+      Effect.catch(error => Effect.succeed({ task: task.id, state: null, head: null, checks: [], mergeable: null, refusal: null, error: error.message })),
+      Effect.map(read => [task.id, read] as const))));
   const secondmates = yield* Effect.forEach((yield* store.secondmates()).filter(s => s.status === "active"), secondmate => Effect.gen(function*() {
     const liveness = yield* transport.liveness(secondmate.home).pipe(Effect.catch(error => Effect.succeed({ owner: "unknown" as const, pid: null, error: error.message })));
     const requests = (yield* store.requests(secondmate.id)).filter(request => request.status !== "replied");
@@ -80,8 +79,8 @@ export const fleetSnapshot = Effect.fn("firstmate.fleetSnapshot")(function*(opti
     }))),
     holds: holds.map(hold => ({ id: hold.id, item: hold.itemId, task: hold.taskId, question: hold.question, until: hold.until, origin: hold.origin, since: hold.createdAt })),
     decisions: (yield* store.decisions()).filter(d => d.status === "pending").map(d => ({ id: d.id, task: d.taskId, tool: d.tool, since: d.createdAt })),
-    prs: tasks.flatMap((task, index) => task.run.pr ? [{
-      task: task.id, url: task.run.pr.url, number: task.run.pr.number, head: task.run.pr.head, target: task.run.pr.target, taskState: task.run.state, yolo: task.policy.yolo ?? false, live: live[index] ?? null,
+    prs: tasks.flatMap(task => task.run.pr ? [{
+      task: task.id, url: task.run.pr.url, number: task.run.pr.number, head: task.run.pr.head, target: task.run.pr.target, taskState: task.run.state, yolo: task.policy.yolo ?? false, live: live.get(task.id) ?? null,
     }] : []),
     secondmates,
     projects: (yield* store.projectEntries()).map(entry => "malformed" in entry ? { name: entry.name, malformed: entry.malformed } : {
@@ -150,7 +149,7 @@ export function bearings(snapshot: FleetSnapshot) {
   for (const note of waiting.inbox) call.push({ line: `inbox note ${note.id}: ${note.text.split("\n")[0]!.slice(0, 80)}`, detail: [`Handle, then firstmate inbox ack ${note.id}`] });
   for (const mention of waiting.mentions) call.push({ line: `Relay mention ${mention.requestId} waits for handling`, detail: [`firstmate relay show ${mention.requestId}`] });
   for (const signal of waiting.upstream) call.push({ line: `upstream signal on ${signal.url ?? `link ${signal.link}`} (${signal.triage}): ${signal.excerpt.split("\n")[0]!.slice(0, 80)}`, detail: [`firstmate upstream ack ${signal.link} ${signal.token} --disposition filed|hold|no-action`] });
-  for (const action of waiting.outbox) call.push({ line: `outbox ${action.id}: a ${action.channel} action on ${action.subject} waits for your consent`, detail: [`firstmate outbox show ${action.id}`] });
+  for (const action of waiting.outbox) call.push({ line: `outbox ${action.id}: the ${action.channel} action on ${action.subject} waits for your consent`, detail: [`firstmate outbox show ${action.id}`] });
   for (const result of waiting.sources.results) call.push({ line: `source ${result.source} result ${result.sequence} (exit ${result.exitCode ?? "none"}) waits to be handled`, detail: [`firstmate source result ${result.source} ${result.sequence}`] });
   for (const source of waiting.sources.down) call.push({ line: `source ${source.id} is ${source.status}${source.problem ? `: ${source.problem}` : ""}`, detail: [`firstmate source start ${source.id}`] });
   for (const mate of snapshot.secondmates.filter(m => m.exhausted)) call.push({ line: `secondmate ${mate.id} exhausted its relaunches (hold ${mate.exhausted})`, detail: [`firstmate secondmate launch ${mate.id} after reading its supervisor.log`] });

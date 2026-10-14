@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { realpathSync } from "node:fs";
 import { realpath, mkdir, stat } from "node:fs/promises";
 import { isAbsolute, relative, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
@@ -20,8 +21,15 @@ export async function holds(cwd: string, args: string[]): Promise<boolean> {
   catch (error) { if ((error as { code?: unknown }).code === 1) return false; throw error; }
 }
 
+/**
+ * The native real path, which on Windows also expands 8.3 short names (such
+ * as RUNNER~1) that `realpathSync` keeps; a path that cannot be read is only
+ * resolved.
+ */
+const canonical = (path: string) => { try { return realpathSync.native(path); } catch { return resolve(path); } };
+
 export const contains = (root: string, candidate: string): boolean => {
-  const path = relative(root, candidate);
+  const path = relative(canonical(root), canonical(candidate));
   return path === "" || (!isAbsolute(path) && path !== ".." && !path.startsWith(`..${process.platform === "win32" ? "\\" : "/"}`));
 };
 
