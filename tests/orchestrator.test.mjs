@@ -151,7 +151,7 @@ test("queue concurrency is bounded and one failed task does not cancel another",
   const factory = fake(async function*({ prompt }) {
     active++; peak = Math.max(peak, active);
     try {
-      await new Promise(resolve => setTimeout(resolve, 30));
+      await new Promise(resolve => setTimeout(resolve, 300));
       if (await firstText(prompt) === "task 1") throw new Error("Expected isolated failure");
       yield result();
     } finally { active--; }

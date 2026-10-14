@@ -2,7 +2,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { realpathSync } from "node:fs";
 import { realpath, mkdir, stat } from "node:fs/promises";
-import { isAbsolute, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { Context, Effect, Layer } from "effect";
 import { appError, type FirstmateError, type TaskIntake } from "./domain.js";
 
@@ -23,10 +23,18 @@ export async function holds(cwd: string, args: string[]): Promise<boolean> {
 
 /**
  * The native real path, which on Windows also expands 8.3 short names (such
- * as RUNNER~1) that `realpathSync` keeps; a path that cannot be read is only
- * resolved.
+ * as RUNNER~1) that `realpathSync` keeps. A path that does not exist yet is
+ * its nearest existing ancestor's real path joined with the rest, so it
+ * compares like the existing paths beside it.
  */
-const canonical = (path: string) => { try { return realpathSync.native(path); } catch { return resolve(path); } };
+const canonical = (path: string): string => {
+  const resolved = resolve(path);
+  try { return realpathSync.native(resolved); }
+  catch {
+    const parent = dirname(resolved);
+    return parent === resolved ? resolved : join(canonical(parent), basename(resolved));
+  }
+};
 
 export const contains = (root: string, candidate: string): boolean => {
   const path = relative(canonical(root), canonical(candidate));
