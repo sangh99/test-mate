@@ -1,0 +1,1166 @@
+{
+  "schema": "firstmate-helper-migration.v1",
+  "source": "Bash Firstmate bin/",
+  "date": "2026-10-14",
+  "assessment": "Architecture and script-header mapping, not a completed per-script behavioral audit or equivalence proof.",
+  "files": 219,
+  "families": {
+    "development": {
+      "title": "Bash development and lab tools",
+      "status": "Development only",
+      "target": "npm scripts, tests and standalone CI"
+    },
+    "posture": {
+      "title": "Away posture and operational memory",
+      "status": "Partial",
+      "target": "Posture records with the verbatim away mandate, posture-aware wake triage in the supervisor, the ReturnBrief renderer, home Memory loaded into worker context, and Stow; planned memory tiers and budget, spend caps and the return catch-up gate"
+    },
+    "integrations": {
+      "title": "Relay, public commitments, mail and voice",
+      "status": "Partial",
+      "target": "Optional Relay connector behind an HTTP adapter with mention wakes, follow-up budget, and typed promised final replies that gate cleanup, and the consent-gated durable Outbox; planned mail and voice connectors"
+    },
+    "secondmates": {
+      "title": "Persistent and remote secondmates",
+      "status": "Partial",
+      "target": "Local secondmate registry, Transport adapter, transactional Handoff, correlated requests and published replies, bounded relaunch, shared preferences; planned remote transport"
+    },
+    "extensions": {
+      "title": "Registered checks, process events and extensions",
+      "status": "Partial",
+      "target": "One extension registry opened by the supervisor, process-to-event sources with registration generations, durable captured results and handled acknowledgements; planned registered checks, condition-action watches, and trusted external adapters"
+    },
+    "views": {
+      "title": "Fleet projections and presentation",
+      "status": "Partial",
+      "target": "FleetSnapshot behind list, fleet and bearings (terminal, JSON, or a dated file) with opt-in live PR reads; planned visual fleet board"
+    },
+    "dispatch": {
+      "title": "Model dispatch, accounts and quota",
+      "status": "Partial",
+      "target": "Dispatch profiles with precedence, quota-resolved profile arrays with per-candidate evidence, the effort fallback, and Claude account pins; planned vendor auth probes, tool exclusions, and mid-task quota wakes"
+    },
+    "adapters": {
+      "title": "Terminal and harness-specific mechanics",
+      "status": "Replace mechanism",
+      "target": "Worker runtime adapter with the Claude SDK as the verified reference; optional future runtime adapters"
+    },
+    "delivery": {
+      "title": "Validation, publishing and landing",
+      "status": "Partial",
+      "target": "Delivery modes, merge authority, local-only landing, GitHub direct-PR delivery through the Forge adapter, no-mistakes validation through the Pipeline adapter, clone refresh, and Cleanup; planned other forges"
+    },
+    "supervision": {
+      "title": "Continuous supervision and recovery",
+      "status": "Partial",
+      "target": "Supervisor, wake queue, event classifier, recovery ladder and per-project capacity; planned fleet review"
+    },
+    "tasks": {
+      "title": "Task lifecycle and durable steering",
+      "status": "Partial",
+      "target": "TaskStore steering records, lifecycle controls, the backlog and captain holds, Orchestrator streaming input; planned keyed-answer channels and board reconcile requests"
+    },
+    "projects": {
+      "title": "Projects, configuration and process utilities",
+      "status": "Partial",
+      "target": "Worktrees, ProcessRunner, project registry with intake resolution and capacity, npm self-update that drains and restarts the supervisors, and opt-in Bash record import; planned Config beyond the registry"
+    }
+  },
+  "entries": [
+    {
+      "path": "bin/backends/cmux.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/backends/herdr-eventwait.py",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/backends/herdr-workspace-move.py",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/backends/herdr.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/backends/orca.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/backends/tmux.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/backends/zellij.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-afk-contract.sh",
+      "family": "posture",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-afk-launch.sh",
+      "family": "posture",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-afk-return.sh",
+      "family": "posture",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-afk-start.sh",
+      "family": "posture",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-agent-process-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-agy-trust.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-arm-command-policy.mjs",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-arm-pretool-check.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-backend-hometag-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-backend.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-backlog-handoff.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-backlog-receive.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-backlog-transition-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-bearings-board.sh",
+      "family": "views",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-bearings-snapshot.sh",
+      "family": "views",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-bootstrap.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-branch-dispatch.mjs",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-branch-outcome.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-branch-prompt.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-branch-report.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-brief-heading-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-brief.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-busy-event.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-busy-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-captain-hold.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-cd-command-policy.mjs",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-cd-pretool-check.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-check-lib.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-check-register.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-check-unregister.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-classify-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-claude-stop-autoarm.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-claude-trust.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-composer-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-config-inherit-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-config-push.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-contributions.jq",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-contributions.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-control-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-control.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-crew-state.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-cursor-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-decision-hold.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-devin-config.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-dispatch-resolve.sh",
+      "family": "dispatch",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-doc-audience-check.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-dod-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-ensure-agents-md.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-env-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-exclude-tools-lib.sh",
+      "family": "dispatch",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-extension-launch-barrier.mjs",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-extension.mjs",
+      "family": "extensions",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-extension.sh",
+      "family": "extensions",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-ff-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-fleet-ledger.sh",
+      "family": "views",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-fleet-snapshot.sh",
+      "family": "views",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-fleet-sync.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-fleet-view.sh",
+      "family": "views",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-forge-detect.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-gate-refuse-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-gemini-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-git-strip-ai-trailers.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-guard.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-harness.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-herdr-ci-cleanup.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-herdr-lab-viewer.py",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-herdr-lab.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-herdr-session-cleanup.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-hold-reason-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-home-seed.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-home-summary-refresh.sh",
+      "family": "views",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-hook-host-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-host-mirror.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-inactive-reconcile.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-inbox.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-install-actionlint.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-install-herdr.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-install-shellcheck.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-install-treehouse.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-jev-mem-guard.py",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-jev-mem-guard.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-kimi-turnend-hook.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-lab-home.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-landed-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-lease-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-lease.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-line-cap-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-lint-workflows.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-lint.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-live-lab.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-lock-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-lock.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-mail-check.sh",
+      "family": "integrations",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-mail.py",
+      "family": "integrations",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-mail.sh",
+      "family": "integrations",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-marker-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-merge-authority-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-merge-local.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-merge-outcome-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-nm-run-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-on.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-operational-input.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-parent-channel-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-path-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-peek.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-pending-reply-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-pipeline-spend.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-pr-check.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-pr-lib.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-pr-merge.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-pr-poll.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-pr-reviewers.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-pr-state.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-primary-scope-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-procevent-extension-capture.pl",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-procevent-lavish.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-procevent-lib.sh",
+      "family": "extensions",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-procevent-quota.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-procevent-remote-reply.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-procevent-when.sh",
+      "family": "extensions",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-procevent.sh",
+      "family": "extensions",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-project-capacity-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-project-mode.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-project-origin-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-promote.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-public-followup-collect.sh",
+      "family": "integrations",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-public-followup-emit.sh",
+      "family": "integrations",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-public-followup-lib.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-public-followup.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-push-transition-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-quota-axi-lib.sh",
+      "family": "dispatch",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-quota-choose.sh",
+      "family": "dispatch",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-remote-delta-read.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-doctor.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-entrypoint.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-file.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-herdr-guard.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-herdr-owner-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-home-provision.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-home-seed.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-inherit-push.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-inherit.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-job-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-job-reap-orphans.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-job-worker.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-readiness-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-secondmate-control.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-remote-secondmate-relaunch.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-review-diff.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-secondmate-charter-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-liveness-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-nudge-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-parent-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-reconcile.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-registry-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-report.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-restart-lib.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-secondmate-restart.sh",
+      "family": "secondmates",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-send.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-session-lock-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-session-start.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-sessionstart-cursor.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-sessionstart-nudge.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-sessionstart-run.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-spawn.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-startup-growth-check.sh",
+      "family": "posture",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-startup-memory-budget-lib.sh",
+      "family": "posture",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-startup-memory-budget.sh",
+      "family": "posture",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-startup-network.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-stow-cascade.sh",
+      "family": "posture",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-subagent-pretool-check.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-supervise-daemon.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-supervision-engine-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-supervision-host.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-supervision-instructions.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-supervision-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-supervisor-target-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-tangle-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-task-inbox-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-tasks-axi-lib.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-tasks-axi.sh",
+      "family": "tasks",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-teardown.sh",
+      "family": "delivery",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-test-isolation-proof.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-test-run.sh",
+      "family": "development",
+      "status": "Development only"
+    },
+    {
+      "path": "bin/fm-timeout-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-timing-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-tmux-lib.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-tool-update-check.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-trace-context-lib.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-transition-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-turnend-guard-cursor.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-turnend-guard-grok.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-turnend-guard.sh",
+      "family": "adapters",
+      "status": "Replace mechanism"
+    },
+    {
+      "path": "bin/fm-update.sh",
+      "family": "projects",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-vendor-auth-probe.sh",
+      "family": "dispatch",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-voice-client.py",
+      "family": "integrations",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-voice-relay.py",
+      "family": "integrations",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm-wake-drain.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-wake-grant.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-wake-lib.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-watch-arm.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-watch-checkpoint.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-watch.sh",
+      "family": "supervision",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-worker-account-lib.sh",
+      "family": "dispatch",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-x-dismiss.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-x-followup.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-x-lib.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-x-link.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-x-poll.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm-x-reply.sh",
+      "family": "integrations",
+      "status": "Partial"
+    },
+    {
+      "path": "bin/fm_voice_frame.py",
+      "family": "integrations",
+      "status": "Pending"
+    },
+    {
+      "path": "bin/fm_voice_records.py",
+      "family": "integrations",
+      "status": "Pending"
+    }
+  ]
+}
